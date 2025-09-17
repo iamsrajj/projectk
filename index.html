@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Project K - Sraj</title>
+    <link rel="icon" type="image/x-icon" href="/k_logo.ico" />
+    <style>
+      :root {
+        --bg: #0f1724;
+        --card: #0b1220;
+        --muted: #94a3b8;
+        --accent: #0ea5e9;
+        --bubble-user: #0b84d6;
+        --bubble-bot: #111827;
+        --maxw: 900px;
+        --glass: rgba(255, 255, 255, 0.03);
+      }
+      * {
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        height: 100%;
+      }
+      body {
+        margin: 0;
+        font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI",
+          Roboto, "Helvetica Neue", Arial;
+        background: linear-gradient(180deg, #071023 0%, #071021 60%);
+        color: #e6eef6;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 18px;
+        min-height: 100vh;
+      }
+      .app {
+        width: 100%;
+        max-width: var(--maxw);
+        background: linear-gradient(
+          180deg,
+          rgba(255, 255, 255, 0.02),
+          rgba(255, 255, 255, 0.01)
+        );
+        border-radius: 12px;
+        box-shadow: 0 8px 40px rgba(2, 6, 23, 0.6);
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        min-height: 80vh;
+      }
+      .topbar {
+        display: flex;
+        gap: 16px;
+        align-items: center;
+        padding: 16px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+      }
+      .brand h1 {
+        margin: 0;
+        font-size: 1.15rem;
+      }
+      .tag {
+        margin: 2px 0 0;
+        font-size: 0.8rem;
+        color: var(--muted);
+      }
+      .controls {
+        margin-left: auto;
+        display: flex;
+        gap: 8px;
+        align-items: center;
+      }
+      .small {
+        display: flex;
+        flex-direction: column;
+        font-size: 0.75rem;
+        color: var(--muted);
+      }
+      .small input {
+        margin-top: 6px;
+        padding: 8px 10px;
+        border-radius: 8px;
+        border: 1px solid rgba(255, 255, 255, 0.03);
+        background: var(--glass);
+        color: inherit;
+        min-width: 150px;
+      }
+      .chat-wrap {
+        display: flex;
+        flex-direction: column;
+        flex: 1;
+        padding: 16px;
+        gap: 12px;
+      }
+      .messages {
+        flex: 1;
+        overflow-x: auto; /* allow horizontal scroll */
+        overflow-y: auto;
+        padding: 12px;
+        border-radius: 10px;
+        background: linear-gradient(
+          180deg,
+          rgba(255, 255, 255, 0.01),
+          rgba(255, 255, 255, 0)
+        );
+        border: 1px solid rgba(255, 255, 255, 0.02);
+      }
+      .msg {
+        display: flex;
+        gap: 10px;
+        align-items: flex-end;
+        margin: 8px 0;
+        max-width: 80%;
+      }
+      .msg.bot {
+        justify-content: flex-start;
+      }
+      .msg.user {
+        justify-content: flex-end;
+        margin-left: auto;
+      }
+      .avatar {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 600;
+        color: #fff;
+      }
+      .avatar.bot {
+        background: rgba(255, 255, 255, 0.06);
+      }
+      .avatar.user {
+        background: var(--bubble-user);
+      }
+      .bubble {
+        padding: 10px 14px;
+        border-radius: 12px;
+        font-size: 0.95rem;
+        line-height: 1.3;
+        white-space: pre-wrap;
+        word-break: break-word;
+      }
+      .bubble.bot {
+        background: var(--bubble-bot);
+        color: #e6eef6;
+        border: 1px solid rgba(255, 255, 255, 0.02);
+      }
+      .bubble.user {
+        background: var(--bubble-user);
+        color: white;
+        border-bottom-right-radius: 4px;
+      }
+      .composer {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+      textarea#messageInput {
+        width: 100%;
+        min-height: 72px;
+        resize: vertical;
+        padding: 12px;
+        border-radius: 10px;
+        border: 1px solid rgba(255, 255, 255, 0.03);
+        background: transparent;
+        color: inherit;
+        font-size: 1rem;
+      }
+      .composer-actions {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+      }
+      .btn {
+        padding: 8px 12px;
+        border-radius: 8px;
+        border: 1px solid rgba(255, 255, 255, 0.04);
+        background: transparent;
+        color: var(--muted);
+        cursor: pointer;
+      }
+      .btn.primary {
+        background: var(--accent);
+        color: #042033;
+        border: none;
+      }
+      .btn:active {
+        transform: translateY(1px);
+      }
+      .footer {
+        padding: 10px 14px;
+        border-top: 1px solid rgba(255, 255, 255, 0.02);
+        color: var(--muted);
+        font-size: 0.85rem;
+      }
+      .typing {
+        font-style: italic;
+        color: var(--muted);
+        font-size: 0.9rem;
+      }
+      @media (max-width: 700px) {
+        .controls {
+          flex-direction: column;
+          align-items: flex-end;
+        }
+        .small input {
+          min-width: 120px;
+        }
+        .brand h1 {
+          font-size: 1rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="app">
+      <header class="topbar">
+        <div class="brand">
+          <h1>Project K — Your Partner</h1>
+          <p class="tag">Chat with your AI assistant</p>
+        </div>
+        <div class="controls">
+          <label class="small">
+            Session ID
+            <input
+              id="sessionIdInput"
+              type="text"
+              placeholder="auto-generated or enter id"
+            />
+          </label>
+        </div>
+      </header>
+      <section class="chat-wrap">
+        <div id="messages" class="messages" aria-live="polite"></div>
+        <div class="composer">
+          <textarea
+            id="messageInput"
+            placeholder="Type your message... (Shift+Enter for newline)"
+          ></textarea>
+          <div class="composer-actions">
+            <button id="sendBtn" class="btn primary">Send</button>
+            <button id="clearBtn" class="btn">Clear</button>
+            <button id="copyBtn" class="btn">Copy Reply</button>
+            <button id="downloadBtn" class="btn">Download</button>
+          </div>
+        </div>
+      </section>
+      <footer class="footer">
+        <small
+          >© 2025 Project K — All rights reserved. Developed by Shashwat
+          Raj.</small
+        >
+      </footer>
+    </main>
+
+    <script>
+      // Config (edit for your environment)
+      const API_URL = "https://projectk.infean.in:11443/k/chat"; // <-- your API
+      const DEFAULT_API_KEY = "k_3fV9wqYbN8rLk7sTgQ2hM-4aP0ZxU6vRjC1"; // optional demo key
+
+      // Wrap everything so it runs after DOM is ready
+      document.addEventListener("DOMContentLoaded", () => {
+        // Get DOM elements safely
+        const messagesEl = document.getElementById("messages");
+        const msgInput = document.getElementById("messageInput");
+        const sendBtn = document.getElementById("sendBtn");
+        const clearBtn = document.getElementById("clearBtn");
+        const copyBtn = document.getElementById("copyBtn");
+        const downloadBtn = document.getElementById("downloadBtn");
+        const sessionIdInput = document.getElementById("sessionIdInput");
+        const apiKeyInput = document.getElementById("apiKeyInput");
+
+        // Defensive checks
+        if (!messagesEl || !msgInput || !sendBtn) {
+          console.error(
+            "Critical DOM elements are missing. Aborting script initialization."
+          );
+          return;
+        }
+
+        // Session management
+        function getSessionId() {
+          const manual = sessionIdInput?.value?.trim();
+          if (manual) {
+            try {
+              localStorage.setItem("pk_session_id", manual);
+            } catch (e) {}
+            return manual;
+          }
+          let s = null;
+          try {
+            s = localStorage.getItem("pk_session_id");
+          } catch (e) {}
+          if (!s) {
+            s = String(Math.floor(Math.random() * 1e9));
+            try {
+              localStorage.setItem("pk_session_id", s);
+            } catch (e) {}
+          }
+          if (sessionIdInput) sessionIdInput.value = s;
+          return s;
+        }
+
+        // Conversation store
+        let convo = [];
+
+        // Safe render helper (escape + minimal formatting)
+        function escapeHtml(str) {
+          return (str ?? "")
+            .toString()
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;");
+        }
+        function renderSimpleMarkdown(text) {
+          if (!text) return "";
+          const esc = escapeHtml(text);
+          const codeRegex = /```([\s\S]*?)```/g;
+          let html = esc.replace(
+            codeRegex,
+            (_, code) => `<pre><code>${code}</code></pre>`
+          );
+          html = html.replace(/`([^`]+)`/g, "<code>$1</code>");
+          html = html
+            .split("\n\n")
+            .map((p) => p.replace(/\n/g, "<br>"))
+            .join("<p></p>");
+          return html;
+        }
+
+        // Render message
+        function renderMessage(text, who = "bot") {
+          const wrap = document.createElement("div");
+          wrap.className = `msg ${who === "user" ? "user" : "bot"}`;
+
+          const avatar = document.createElement("div");
+          avatar.className = `avatar ${who === "user" ? "user" : "bot"}`;
+
+          if (who === "bot") {
+            const img = document.createElement("img");
+            img.src = "/k_logo.png"; // <-- your logo file
+            img.alt = "Bot Logo";
+            img.style.width = "100%";
+            img.style.height = "100%";
+            img.style.borderRadius = "50%";
+            avatar.innerHTML = "";
+            avatar.appendChild(img);
+          } else {
+            avatar.textContent = "U"; // keep user as letter U
+          }
+
+          const bubble = document.createElement("div");
+          bubble.className = `bubble ${who === "user" ? "user" : "bot"}`;
+          bubble.innerHTML = renderSimpleMarkdown(text);
+
+          wrap.appendChild(avatar);
+          wrap.appendChild(bubble);
+          messagesEl.appendChild(wrap);
+          messagesEl.scrollTop = messagesEl.scrollHeight;
+        }
+
+        // Typing indicator
+        let typingEl = null;
+        function showTyping() {
+          if (typingEl) return;
+          typingEl = document.createElement("div");
+          typingEl.className = "msg bot";
+          typingEl.innerHTML =
+            '<div class="avatar bot">K</div><div class="bubble bot typing">Typing…</div>';
+          messagesEl.appendChild(typingEl);
+          messagesEl.scrollTop = messagesEl.scrollHeight;
+        }
+        function hideTyping() {
+          if (!typingEl) return;
+          try {
+            messagesEl.removeChild(typingEl);
+          } catch (e) {}
+          typingEl = null;
+        }
+
+        // Send message
+        async function sendMessage() {
+          const text = msgInput.value;
+          if (!text || !text.trim()) return;
+          const trimmed = text.trim();
+          renderMessage(trimmed, "user");
+          convo.push({
+            who: "user",
+            text: trimmed,
+            time: new Date().toISOString(),
+          });
+          msgInput.value = "";
+          const session_id = getSessionId();
+          const apiKey = apiKeyInput?.value?.trim() || DEFAULT_API_KEY;
+
+          showTyping();
+          try {
+            const formData = new FormData();
+            formData.append("message", trimmed);
+            formData.append("session_id", session_id);
+
+            const resp = await fetch(API_URL, {
+              method: "POST",
+              headers: {
+                "X-API-KEY": apiKey,
+              },
+              body: formData,
+            });
+
+            if (!resp.ok) {
+              const errText = await resp
+                .text()
+                .catch(() => `HTTP ${resp.status}`);
+              throw new Error(errText || `HTTP ${resp.status}`);
+            }
+
+            const data = await resp
+              .json()
+              .catch(() => ({ reply: "Invalid JSON response" }));
+            hideTyping();
+            const reply = data.reply ?? data.message ?? JSON.stringify(data);
+            renderMessage(reply, "bot");
+            convo.push({
+              who: "bot",
+              text: reply,
+              time: new Date().toISOString(),
+            });
+
+            if (data.session_id && sessionIdInput) {
+              sessionIdInput.value = data.session_id;
+              try {
+                localStorage.setItem("pk_session_id", data.session_id);
+              } catch (e) {}
+            }
+          } catch (err) {
+            hideTyping();
+            renderMessage("Error: " + (err?.message ?? err), "bot");
+          }
+        }
+
+        // Attach events safely
+        sendBtn.addEventListener("click", sendMessage);
+        msgInput.addEventListener("keydown", (e) => {
+          if (e.key === "Enter" && !e.shiftKey) {
+            e.preventDefault();
+            sendMessage();
+          }
+        });
+
+        if (clearBtn)
+          clearBtn.addEventListener("click", () => {
+            messagesEl.innerHTML = "";
+            convo = [];
+          });
+        if (copyBtn)
+          copyBtn.addEventListener("click", async () => {
+            const last = [...convo].reverse().find((m) => m.who === "bot");
+            if (!last) return alert("No bot replies to copy yet.");
+            try {
+              await navigator.clipboard.writeText(last.text);
+              alert("Last reply copied to clipboard");
+            } catch (e) {
+              alert("Unable to copy to clipboard");
+            }
+          });
+        if (downloadBtn)
+          downloadBtn.addEventListener("click", () => {
+            if (!convo.length) return alert("No conversation to download.");
+            const txt = convo
+              .map((c) => `[${c.time}] ${c.who.toUpperCase()}: ${c.text}`)
+              .join("\n\n");
+            const blob = new Blob([txt], { type: "text/plain" });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = `projectk_convo_${new Date()
+              .toISOString()
+              .replace(/[:.]/g, "-")}.txt`;
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+            URL.revokeObjectURL(url);
+          });
+
+        if (sessionIdInput) {
+          sessionIdInput.addEventListener("change", () => {
+            const v = sessionIdInput.value?.trim();
+            if (v)
+              try {
+                localStorage.setItem("pk_session_id", v);
+              } catch (e) {}
+          });
+        }
+
+        // Init: restore session and show welcome
+        (function init() {
+          try {
+            const s = localStorage.getItem("pk_session_id");
+            if (s && sessionIdInput) sessionIdInput.value = s;
+          } catch (e) {}
+          renderMessage("Hi — I'm Project K. Ask me anything!", "bot");
+          convo.push({
+            who: "bot",
+            text: "Hi — I'm Project K. Ask me anything!",
+            time: new Date().toISOString(),
+          });
+          msgInput.focus();
+        })();
+      }); // DOMContentLoaded
+    </script>
+  </body>
+</html>
